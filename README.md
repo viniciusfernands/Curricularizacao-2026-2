@@ -109,17 +109,18 @@ Por isso, a solução deverá priorizar a **compatibilidade entre diferentes sis
 
 ## 🛠️ Tecnologias utilizadas
 
-> Esta seção será atualizada conforme as tecnologias do projeto forem definidas.
+### Desenvolvimento
 
-<!--
-Exemplo:
+- TypeScript
+- React
+- Vite
+- Phaser
+- Tailwind CSS
 
-- Front-end:
-- Back-end:
-- Banco de dados:
-- Frameworks:
-- Ferramentas:
--->
+### Desenvolvimento e colaboração
+
+- Git
+- GitHub
 
 ---
 
