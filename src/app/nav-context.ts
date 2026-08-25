@@ -1,18 +1,20 @@
 import { createContext, useContext } from 'react';
-import type { ActivityId, Difficulty } from '../domain/types';
+import type { Difficulty } from '../domain/types';
 
 /**
  * Rotas da aplicação. Cada rota carrega os parâmetros de que precisa, então é
- * impossível chegar na tela de jogo sem ter escolhido nível e atividade.
+ * impossível chegar na tela de jogo sem ter escolhido o nível.
+ *
+ * Não há seleção de tema: as perguntas misturam todos os temas (contagem,
+ * cores, sílabas, etc.) dentro do nível escolhido.
  * (Contexto e hook ficam separados do Provider para não quebrar o Fast Refresh.)
  */
 export type Route =
   | { name: 'home' }
   | { name: 'identify' }
   | { name: 'levels' }
-  | { name: 'activities'; difficulty: Difficulty }
-  | { name: 'game'; difficulty: Difficulty; activity: ActivityId }
-  | { name: 'result'; difficulty: Difficulty; activity: ActivityId };
+  | { name: 'game'; difficulty: Difficulty }
+  | { name: 'result'; difficulty: Difficulty };
 
 export type RouteName = Route['name'];
 

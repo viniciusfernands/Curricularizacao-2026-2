@@ -4,7 +4,6 @@ import { SessionProvider } from './state/session';
 import { HomeScreen } from './screens/HomeScreen';
 import { IdentifyScreen } from './screens/IdentifyScreen';
 import { LevelSelectScreen } from './screens/LevelSelectScreen';
-import { ActivitySelectScreen } from './screens/ActivitySelectScreen';
 import { GameScreen } from './screens/GameScreen';
 import { ResultScreen } from './screens/ResultScreen';
 
@@ -19,16 +18,10 @@ function CurrentScreen() {
       return <IdentifyScreen />;
     case 'levels':
       return <LevelSelectScreen />;
-    case 'activities':
-      return <ActivitySelectScreen difficulty={route.difficulty} />;
     case 'game':
-      return (
-        <GameScreen difficulty={route.difficulty} activity={route.activity} />
-      );
+      return <GameScreen difficulty={route.difficulty} />;
     case 'result':
-      return (
-        <ResultScreen difficulty={route.difficulty} activity={route.activity} />
-      );
+      return <ResultScreen difficulty={route.difficulty} />;
   }
 }
 

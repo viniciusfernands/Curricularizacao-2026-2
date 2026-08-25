@@ -28,7 +28,7 @@ export function LevelSelectScreen() {
               icon={LEVEL_STYLE[level].icon}
               color={LEVEL_STYLE[level].color}
               label={DIFFICULTY_LABEL[level]}
-              onClick={() => go({ name: 'activities', difficulty: level })}
+              onClick={() => go({ name: 'game', difficulty: level })}
             />
           ))}
         </div>

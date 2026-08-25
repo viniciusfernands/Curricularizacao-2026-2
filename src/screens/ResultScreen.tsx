@@ -3,25 +3,22 @@ import { Button } from '../components/Button';
 import { useNav } from '../app/nav-context';
 import { useSession } from '../state/session-context';
 import { summarize } from '../data/progress';
-import { getActivity } from '../domain/activities';
-import { DIFFICULTY_LABEL, type ActivityId, type Difficulty } from '../domain/types';
+import { DIFFICULTY_LABEL, type Difficulty } from '../domain/types';
 
 interface ResultScreenProps {
   difficulty: Difficulty;
-  activity: ActivityId;
 }
 
 /**
- * Tela de resultado ao fim de uma atividade.
+ * Tela de resultado ao fim de uma rodada.
  *
  * Mostra um resumo positivo para a criança e oferece jogar de novo ou voltar.
  * Por ora, o resumo vem do histórico agregado (localStorage); quando o jogo
  * existir, exibirá o desempenho da rodada recém-jogada.
  */
-export function ResultScreen({ difficulty, activity }: ResultScreenProps) {
+export function ResultScreen({ difficulty }: ResultScreenProps) {
   const { go, home } = useNav();
   const { child } = useSession();
-  const meta = getActivity(activity);
   const summary = summarize(child ?? undefined);
 
   return (
@@ -32,7 +29,7 @@ export function ResultScreen({ difficulty, activity }: ResultScreenProps) {
         </span>
         <h1 className="text-4xl font-black text-violet-700">Muito bem!</h1>
         <p className="text-xl font-semibold text-slate-500">
-          {meta?.label} · Nível {DIFFICULTY_LABEL[difficulty]}
+          Nível {DIFFICULTY_LABEL[difficulty]}
         </p>
 
         {summary.total > 0 && (
@@ -43,7 +40,7 @@ export function ResultScreen({ difficulty, activity }: ResultScreenProps) {
         )}
 
         <div className="mt-2 flex flex-col gap-3">
-          <Button onClick={() => go({ name: 'game', difficulty, activity })}>
+          <Button onClick={() => go({ name: 'game', difficulty })}>
             🔁 Jogar de novo
           </Button>
           <Button variant="secondary" onClick={home}>

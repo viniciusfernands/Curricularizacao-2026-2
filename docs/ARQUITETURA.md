@@ -59,12 +59,15 @@ React                         Phaser
 ├── Tela inicial              ├── Perguntas
 ├── Identificação da criança  ├── Sprites
 ├── Seleção de nível          ├── Interações (clique/toque)
-├── Seleção de atividade      ├── Animações
-├── Progresso                 └── Efeitos / áudio do jogo
-└── Resultado
-        │
-        └── monta o <canvas> do Phaser só na tela de jogo
+├── Resultado                 ├── Animações
+└── (monta o <canvas>         └── Efeitos / áudio do jogo
+     do Phaser na tela
+     de jogo)
 ```
+
+> **Sem seleção de tema:** a criança escolhe apenas o **nível**. As perguntas
+> misturam todos os temas (contagem, cores, sílabas, etc.) dentro do nível. Cada
+> pergunta guarda o seu tema apenas como marcador, para o registro/relatórios.
 
 **Por que separar:** React é ótimo para menus, formulários e navegação; Phaser foi
 feito especificamente para jogos HTML5 2D e já resolve sprites, animações,
@@ -173,7 +176,7 @@ necessidade de painel de professores, turmas, alunos, etc.
 ## 🧑‍💻 Componentes React previstos
 
 `Button` · `Card` · `AudioButton` · `Question` · `AnswerOption` · `ProgressBar` ·
-`LevelSelection` · `ActivitySelection` · `GameResult`
+`LevelSelection` · `GameResult`
 
 ---
 
