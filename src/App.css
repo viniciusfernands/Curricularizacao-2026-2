@@ -1,0 +1,42 @@
+.app {
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  padding: 48px 24px;
+  box-sizing: border-box;
+}
+
+.app__header {
+  margin-bottom: 28px;
+}
+
+.app__eyebrow {
+  color: #8b5cf6;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.app h1 {
+  margin: 8px 0;
+}
+
+.game-shell {
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid #312e81;
+  border-radius: 16px;
+  background: #0f172a;
+  box-shadow: 0 24px 80px rgb(15 23 42 / 35%);
+}
+
+.game-shell canvas {
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .app {
+    padding: 28px 16px;
+  }
+}
