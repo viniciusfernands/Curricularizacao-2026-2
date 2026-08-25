@@ -8,6 +8,11 @@ A proposta consiste no desenvolvimento de um **jogo educacional interativo** des
 
 O projeto busca aproximar a formação acadêmica de uma demanda real da comunidade, permitindo que os estudantes participem das etapas de levantamento de requisitos, planejamento, design, desenvolvimento, testes e validação de uma solução tecnológica aplicada à educação.
 
+### 📚 Documentação do projeto
+
+- [Arquitetura e stack](docs/ARQUITETURA.md)
+- [Proposta inicial de atividades](docs/ATIVIDADES.md)
+
 ---
 
 ## 🎯 Objetivo
