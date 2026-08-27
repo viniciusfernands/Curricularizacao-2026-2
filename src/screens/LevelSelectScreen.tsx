@@ -1,38 +1,56 @@
 import { AppShell } from '../components/AppShell';
+import { AnimalPortrait } from '../components/AnimalPortrait';
 import { TileButton } from '../components/TileButton';
 import { useNav } from '../app/nav-context';
 import { DIFFICULTIES, DIFFICULTY_LABEL, type Difficulty } from '../domain/types';
 
-// Aparência de cada nível no menu (ícone e cor).
-const LEVEL_STYLE: Record<Difficulty, { icon: string; color: string }> = {
-  facil: { icon: '🌱', color: 'bg-emerald-100 hover:bg-emerald-200' },
-  medio: { icon: '⭐', color: 'bg-amber-100 hover:bg-amber-200' },
-  dificil: { icon: '🚀', color: 'bg-rose-100 hover:bg-rose-200' },
+const LEVEL_STYLE: Record<
+  Difficulty,
+  { image: string; color: string; description: string }
+> = {
+  facil: {
+    image: '/assets/animals/cat/cat_happy.png',
+    color: 'level-tile--green',
+    description: 'Vamos começar!',
+  },
+  medio: {
+    image: '/assets/animals/cow/cow_happy.png',
+    color: 'level-tile--yellow',
+    description: 'Um novo desafio!',
+  },
+  dificil: {
+    image: '/assets/animals/lion/lion_happy.png',
+    color: 'level-tile--coral',
+    description: 'Para exploradores!',
+  },
 };
 
-/** Seleção do nível de dificuldade: Fácil, Médio, Difícil. */
 export function LevelSelectScreen() {
   const { go } = useNav();
 
   return (
     <AppShell>
-      <div className="flex w-full max-w-4xl flex-col items-center gap-8">
-        <h1 className="text-3xl font-black text-slate-800 sm:text-4xl">
-          Escolha o nível
-        </h1>
+      <section className="flex w-full max-w-5xl flex-col items-center gap-7">
+        <div className="text-center">
+          <span className="game-kicker">ESCOLHA SUA AVENTURA</span>
+          <h1 className="mt-2 text-3xl font-black text-slate-800 sm:text-5xl">
+            Qual nível vamos jogar?
+          </h1>
+        </div>
 
-        <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-3">
+        <div className="grid w-full grid-cols-1 gap-5 sm:grid-cols-3">
           {DIFFICULTIES.map((level) => (
             <TileButton
               key={level}
-              icon={LEVEL_STYLE[level].icon}
+              icon={<AnimalPortrait src={LEVEL_STYLE[level].image} />}
               color={LEVEL_STYLE[level].color}
               label={DIFFICULTY_LABEL[level]}
+              description={LEVEL_STYLE[level].description}
               onClick={() => go({ name: 'game', difficulty: level })}
             />
           ))}
         </div>
-      </div>
+      </section>
     </AppShell>
   );
 }

@@ -11,11 +11,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 // Botão grande e arredondado, pensado para toque e para o público infantil.
 const VARIANTS: Record<Variant, string> = {
-  primary:
-    'bg-violet-600 text-white shadow-lg shadow-violet-600/30 hover:bg-violet-500 active:bg-violet-700',
-  secondary:
-    'bg-white text-violet-700 ring-2 ring-violet-200 hover:bg-violet-50 active:bg-violet-100',
-  ghost: 'bg-transparent text-slate-600 hover:bg-slate-100 active:bg-slate-200',
+  primary: 'cartoon-button--primary',
+  secondary: 'cartoon-button--secondary',
+  ghost: 'cartoon-button--ghost',
 };
 
 const SIZES: Record<Size, string> = {
@@ -33,7 +31,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-3 font-extrabold
+      className={`cartoon-button inline-flex items-center justify-center gap-3 font-extrabold
         transition-transform duration-150 will-change-transform
         hover:scale-105 active:scale-95
         focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-400/60

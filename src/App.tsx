@@ -6,6 +6,7 @@ import { IdentifyScreen } from './screens/IdentifyScreen';
 import { LevelSelectScreen } from './screens/LevelSelectScreen';
 import { GameScreen } from './screens/GameScreen';
 import { ResultScreen } from './screens/ResultScreen';
+import './App.css';
 
 /** Renderiza a tela correspondente à rota atual. */
 function CurrentScreen() {
