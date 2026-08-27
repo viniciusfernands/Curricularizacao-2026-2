@@ -6,22 +6,19 @@ import { DIFFICULTIES, DIFFICULTY_LABEL, type Difficulty } from '../domain/types
 
 const LEVEL_STYLE: Record<
   Difficulty,
-  { image: string; color: string; description: string }
+  { image: string; color: string }
 > = {
   facil: {
     image: '/assets/animals/cat/cat_happy.png',
     color: 'level-tile--green',
-    description: 'Vamos começar!',
   },
   medio: {
     image: '/assets/animals/cow/cow_happy.png',
     color: 'level-tile--yellow',
-    description: 'Um novo desafio!',
   },
   dificil: {
     image: '/assets/animals/lion/lion_happy.png',
     color: 'level-tile--coral',
-    description: 'Para exploradores!',
   },
 };
 
@@ -45,7 +42,6 @@ export function LevelSelectScreen() {
               icon={<AnimalPortrait src={LEVEL_STYLE[level].image} />}
               color={LEVEL_STYLE[level].color}
               label={DIFFICULTY_LABEL[level]}
-              description={LEVEL_STYLE[level].description}
               onClick={() => go({ name: 'game', difficulty: level })}
             />
           ))}

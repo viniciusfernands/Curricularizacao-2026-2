@@ -30,21 +30,21 @@ export function TileButton({
       disabled={disabled}
       onClick={onClick}
       className={`level-tile group relative flex min-h-56 w-full flex-col items-center
-        justify-center gap-2 rounded-[2rem] p-5 text-center
+        justify-center gap-1 rounded-[2rem] p-5 text-center
         transition-transform duration-150 sm:aspect-square
         hover:scale-105 active:scale-95
         focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-400/60
         disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:scale-100
         ${color}`}
     >
-      <span className="flex h-28 w-full items-center justify-center drop-shadow-sm" aria-hidden="true">
+      <span className="level-tile__picture" aria-hidden="true">
         {icon}
       </span>
-      <span className="text-2xl font-black text-slate-800 sm:text-3xl">
+      <span className="level-tile__label">
         {label}
       </span>
       {description && (
-        <span className="text-sm font-semibold text-slate-500">
+        <span className="level-tile__description">
           {description}
         </span>
       )}
