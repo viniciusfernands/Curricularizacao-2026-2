@@ -5,6 +5,7 @@ import { useSession } from '../state/session-context';
 import { saveAttempt } from '../data/progress';
 import { PhaserGame } from '../game/PhaserGame';
 import { DIFFICULTY_LABEL, type Difficulty } from '../domain/types';
+import { questionsFor } from '../game/questions';
 
 interface GameScreenProps {
   difficulty: Difficulty;
@@ -15,6 +16,7 @@ export function GameScreen({ difficulty }: GameScreenProps) {
   const { go } = useNav();
   const { child } = useSession();
   const completed = useRef(false);
+  const questionCount = questionsFor(difficulty).length;
 
   const handleComplete = useCallback(
     (attempts: number) => {
@@ -39,22 +41,22 @@ export function GameScreen({ difficulty }: GameScreenProps) {
     <AppShell>
       <section
         className="flex w-full max-w-5xl flex-col items-center gap-3"
-        aria-label="Atividade: comparação de tamanho"
+        aria-label={`Sequência de ${questionCount} atividades do nível ${DIFFICULTY_LABEL[difficulty]}`}
       >
         <div className="flex w-full items-center justify-between px-1 sm:px-2">
           <p className="text-sm font-black uppercase tracking-[0.16em] text-violet-600 sm:text-base">
             Nível {DIFFICULTY_LABEL[difficulty]}
           </p>
           <p className="rounded-full bg-white/80 px-4 py-2 text-sm font-bold text-slate-500 shadow-sm">
-            Atividade 1
+            {questionCount} atividades
           </p>
         </div>
 
-        <PhaserGame onComplete={handleComplete} />
+        <PhaserGame difficulty={difficulty} onComplete={handleComplete} />
 
         <p className="sr-only">
-          Qual animal é maior? Toque no gato ou no elefante. A resposta correta
-          é o elefante.
+          Complete as atividades apresentadas. Use o botão de áudio para ouvir
+          cada instrução.
         </p>
       </section>
     </AppShell>
