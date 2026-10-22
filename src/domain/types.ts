@@ -38,10 +38,10 @@ export type ActivityType =
   | 'syllable-count';
 
 /**
- * Registro de um resultado de questão. Gerado pela camada de jogo e consumido
- * pela camada de acompanhamento (localStorage hoje; backend no futuro).
+ * Formato legado agregado por nível, preservado apenas para referência.
+ * Novos registros usam InteractionRecord / RunSnapshot em domain/progress.ts.
  */
-export interface AttemptRecord {
+export interface LegacyAttemptRecord {
   /** Nome da criança que jogou (identificação feita pelo professor). */
   child: string;
   activity: ActivityId;

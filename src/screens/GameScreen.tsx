@@ -1,8 +1,9 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { AppShell } from '../components/AppShell';
 import { useNav } from '../app/nav-context';
 import { useSession } from '../state/session-context';
-import { saveAttempt } from '../data/progress';
+import { saveRun } from '../data/progress';
+import { createProgressId, ProgressRun, type QuestionInteraction } from '../domain/progress';
 import { PhaserGame } from '../game/PhaserGame';
 import { DIFFICULTY_LABEL, type Difficulty } from '../domain/types';
 import { questionsFor } from '../game/questions';
@@ -14,27 +15,34 @@ interface GameScreenProps {
 /** Monta a atividade Phaser e mantém navegação/persistência sob responsabilidade do React. */
 export function GameScreen({ difficulty }: GameScreenProps) {
   const { go } = useNav();
-  const { child } = useSession();
+  const { identification } = useSession();
   const completed = useRef(false);
   const questionCount = questionsFor(difficulty).length;
+  const [run] = useState(() => new ProgressRun({
+    id: createProgressId(),
+    ...identification,
+    difficulty,
+    questions: questionsFor(difficulty),
+    startedAt: new Date().toISOString(),
+  }));
+  const saved = useRef(true);
+  const [saveFailed, setSaveFailed] = useState(false);
+
+  const handleInteraction = useCallback((event: QuestionInteraction) => {
+    if (completed.current || !run.record(event)) return;
+    saved.current = saveRun(run.snapshot());
+    setSaveFailed(!saved.current);
+  }, [run]);
 
   const handleComplete = useCallback(
-    (attempts: number) => {
+    () => {
       if (completed.current) return;
+      const summary = run.summarize();
+      if (summary.completedQuestions !== questionCount) return;
       completed.current = true;
-
-      saveAttempt({
-        child: child ?? 'Criança',
-        activity: 'percepcao',
-        difficulty,
-        timestamp: new Date().toISOString(),
-        correct: true,
-        attempts,
-      });
-
-      go({ name: 'result', difficulty });
+      go({ name: 'result', difficulty, summary, saved: saved.current });
     },
-    [child, difficulty, go],
+    [difficulty, go, questionCount, run],
   );
 
   return (
@@ -52,7 +60,14 @@ export function GameScreen({ difficulty }: GameScreenProps) {
           </p>
         </div>
 
-        <PhaserGame difficulty={difficulty} onComplete={handleComplete} />
+        <PhaserGame difficulty={difficulty} onInteraction={handleInteraction} onComplete={handleComplete} />
+
+        {saveFailed && (
+          <p role="status" className="rounded-xl bg-amber-50 px-4 py-2 text-sm text-amber-900">
+            Não foi possível guardar o progresso neste dispositivo. O resumo
+            continua disponível durante esta partida.
+          </p>
+        )}
 
         <p className="sr-only">
           Complete as atividades apresentadas. Use o botão de áudio para ouvir

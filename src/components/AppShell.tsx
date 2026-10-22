@@ -14,7 +14,7 @@ export function AppShell({
   showChild = true,
 }: AppShellProps) {
   const { back, canGoBack } = useNav();
-  const { child } = useSession();
+  const { identification: { child } } = useSession();
 
   return (
     <div className="playground-shell flex min-h-full flex-col overflow-hidden">

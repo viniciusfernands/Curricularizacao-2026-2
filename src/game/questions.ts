@@ -1,7 +1,10 @@
 import type { ActivityId, Difficulty } from '../domain/types';
+import type { PedagogicalObjective } from '../domain/pedagogy';
+import { QUESTION_OBJECTIVES } from './questionObjectives.ts';
 
 export interface GameQuestion {
-  id: string;
+  id: keyof typeof QUESTION_OBJECTIVES;
+  objective: PedagogicalObjective;
   difficulty: Difficulty;
   activity: ActivityId;
   title: string;
@@ -15,7 +18,7 @@ export interface GameQuestion {
     | 'aab-sequence';
 }
 
-export const QUESTIONS: GameQuestion[] = [
+const QUESTION_CONTENT: Omit<GameQuestion, 'objective'>[] = [
   { id: 'F02', difficulty: 'facil', activity: 'espaco', kind: 'cat-in-box', title: 'Onde fica o gato?', instruction: 'Coloque o gato dentro da caixa.' },
   { id: 'F03', difficulty: 'facil', activity: 'contagem', kind: 'apple-count', title: 'Vamos contar?', instruction: 'Coloque três maçãs na cesta.' },
   { id: 'F04', difficulty: 'facil', activity: 'cores', kind: 'blue-choice', title: 'Qual é a cor azul?', instruction: 'Toque na cor azul.' },
@@ -36,6 +39,11 @@ export const QUESTIONS: GameQuestion[] = [
   { id: 'D07', difficulty: 'dificil', activity: 'silabas', kind: 'word-sol', title: 'Forme a palavra SOL', instruction: 'Esta palavra é SOL. Coloque as letras na ordem certa.' },
   { id: 'X04', difficulty: 'dificil', activity: 'percepcao', kind: 'aab-sequence', title: 'Qual figura vem depois?', instruction: 'Observe a sequência. Qual figura vem depois?' },
 ];
+
+export const QUESTIONS: GameQuestion[] = QUESTION_CONTENT.map((question) => ({
+  ...question,
+  objective: QUESTION_OBJECTIVES[question.id],
+}));
 
 export const questionsFor = (difficulty: Difficulty) =>
   QUESTIONS.filter((question) => question.difficulty === difficulty);

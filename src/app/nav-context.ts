@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react';
 import type { Difficulty } from '../domain/types';
+import type { RunSummary } from '../domain/progress';
 
 /**
  * Rotas da aplicação. Cada rota carrega os parâmetros de que precisa, então é
@@ -14,7 +15,7 @@ export type Route =
   | { name: 'identify' }
   | { name: 'levels' }
   | { name: 'game'; difficulty: Difficulty }
-  | { name: 'result'; difficulty: Difficulty };
+  | { name: 'result'; difficulty: Difficulty; summary: RunSummary; saved: boolean };
 
 export type RouteName = Route['name'];
 

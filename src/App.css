@@ -520,3 +520,9 @@
     animation: none;
   }
 }
+
+.cartoon-input.identification-input {
+  padding: 12px 14px;
+  font-size: 1rem;
+  text-align: left;
+}

@@ -1,61 +1,18 @@
-import type { AttemptRecord } from '../domain/types';
+import type { RunSnapshot } from '../domain/progress';
 
-// Camada simples de persistência do acompanhamento das atividades.
-// Hoje grava em localStorage; no futuro pode ser trocado por backend/arquivo
-// mantendo a mesma interface (saveAttempt / loadAttempts / summarize).
+/** A chave antiga curricularizacao:attempts é preservada, sem migração inferida. */
+export const RUN_STORAGE_PREFIX = 'curricularizacao:run:v2:';
 
-const STORAGE_KEY = 'curricularizacao:attempts';
-
-/** Lê todos os registros salvos. Nunca lança — retorna [] em caso de erro. */
-export function loadAttempts(): AttemptRecord[] {
+/** Grava a partida a cada interação. Cada execução tem sua própria chave. */
+export function saveRun(
+  run: RunSnapshot,
+  getStorage: () => Pick<Storage, 'setItem'> = () => localStorage,
+): boolean {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as AttemptRecord[]) : [];
+    getStorage().setItem(`${RUN_STORAGE_PREFIX}${run.id}`, JSON.stringify(run));
+    return true;
   } catch {
-    return [];
+    // O resumo continua disponível em memória; a interface informa a falha.
+    return false;
   }
-}
-
-/** Acrescenta um registro de tentativa ao histórico. */
-export function saveAttempt(record: AttemptRecord): void {
-  try {
-    const all = loadAttempts();
-    all.push(record);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-  } catch {
-    // Armazenamento indisponível (modo privado, cota cheia): ignora
-    // silenciosamente — o jogo não deve travar por causa do registro.
-  }
-}
-
-/** Apaga todo o histórico (útil em testes e para reiniciar). */
-export function clearAttempts(): void {
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch {
-    /* ignora */
-  }
-}
-
-export interface ProgressSummary {
-  total: number;
-  correct: number;
-  errors: number;
-  /** Proporção de acertos, de 0 a 1. */
-  accuracy: number;
-}
-
-/** Resumo agregado do histórico, opcionalmente filtrando por criança. */
-export function summarize(child?: string): ProgressSummary {
-  const records = loadAttempts().filter((r) => !child || r.child === child);
-  const total = records.length;
-  const correct = records.filter((r) => r.correct).length;
-  return {
-    total,
-    correct,
-    errors: total - correct,
-    accuracy: total === 0 ? 0 : correct / total,
-  };
 }

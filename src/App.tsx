@@ -20,9 +20,9 @@ function CurrentScreen() {
     case 'levels':
       return <LevelSelectScreen />;
     case 'game':
-      return <GameScreen difficulty={route.difficulty} />;
+      return <GameScreen key={route.difficulty} difficulty={route.difficulty} />;
     case 'result':
-      return <ResultScreen difficulty={route.difficulty} />;
+      return <ResultScreen difficulty={route.difficulty} summary={route.summary} saved={route.saved} />;
   }
 }
 

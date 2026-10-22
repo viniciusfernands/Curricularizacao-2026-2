@@ -1,14 +1,11 @@
 import { createContext, useContext } from 'react';
 
-/**
- * Sessão da criança atual. A identificação é feita pelo professor (a criança
- * de 5–6 anos não digita), então guardamos apenas o nome por enquanto.
- * (Contexto e hook ficam separados do Provider para não quebrar o Fast Refresh.)
- */
+import type { Identification } from '../domain/identification';
+
+/** Identificação opcional da sessão, preenchida com ajuda de um adulto. */
 export interface SessionValue {
-  child: string | null;
-  setChild: (name: string) => void;
-  clearChild: () => void;
+  identification: Identification;
+  setIdentification: (value: Partial<Identification>) => void;
 }
 
 export const SessionContext = createContext<SessionValue | null>(null);

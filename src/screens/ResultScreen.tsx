@@ -2,18 +2,18 @@ import { AppShell } from '../components/AppShell';
 import { AnimalPortrait } from '../components/AnimalPortrait';
 import { Button } from '../components/Button';
 import { useNav } from '../app/nav-context';
-import { useSession } from '../state/session-context';
-import { summarize } from '../data/progress';
+import type { RunSummary } from '../domain/progress';
+import { AREA_LABELS } from '../domain/pedagogy';
 import { DIFFICULTY_LABEL, type Difficulty } from '../domain/types';
 
 interface ResultScreenProps {
   difficulty: Difficulty;
+  summary: RunSummary;
+  saved: boolean;
 }
 
-export function ResultScreen({ difficulty }: ResultScreenProps) {
+export function ResultScreen({ difficulty, summary, saved }: ResultScreenProps) {
   const { go, home } = useNav();
-  const { child } = useSession();
-  const summary = summarize(child ?? undefined);
 
   return (
     <AppShell showBack={false}>
@@ -36,10 +36,10 @@ export function ResultScreen({ difficulty }: ResultScreenProps) {
             Nível {DIFFICULTY_LABEL[difficulty]}
           </p>
 
-          {summary.total > 0 && (
+          {summary.attempts > 0 && (
             <div className="flex gap-3">
-              <Stat icon="✓" value={summary.correct} label="Acertos" />
-              <Stat icon="↻" value={summary.errors} label="Tentativas" />
+              <Stat icon="✓" value={summary.completedQuestions} label="Atividades" />
+              <Stat icon="↻" value={summary.attempts} label="Tentativas" />
             </div>
           )}
 
@@ -52,6 +52,52 @@ export function ResultScreen({ difficulty }: ResultScreenProps) {
             </Button>
           </div>
         </div>
+
+        <details className="relative z-10 w-full min-w-0 rounded-2xl bg-white/90 p-4 text-slate-700 md:col-span-2">
+          <summary className="cursor-pointer rounded-lg font-bold focus-visible:outline-2 focus-visible:outline-violet-600">
+            Acompanhamento para o adulto — esta partida
+          </summary>
+          <p className="my-3 text-sm">
+            {summary.completedQuestions} de {summary.questionCount} atividades concluídas.
+            {' '}{summary.attempts} tentativas avaliadas: {summary.correct} acertos e {summary.errors} erros.
+            {' '}Uma atividade pode ter várias respostas; cada posicionamento avaliado
+            ou par de memória conta uma tentativa. Na contagem, colocações intermediárias
+            são progresso e não somam acertos.
+          </p>
+          {!saved && (
+            <p role="status" className="mb-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
+              Não foi possível guardar todos os registros neste dispositivo.
+              Este resumo inclui as respostas da partida que continuam em memória.
+            </p>
+          )}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <caption className="sr-only">Resultados por pergunta e habilidade nesta partida</caption>
+              <thead>
+                <tr>
+                  <th scope="col" className="p-2">Pergunta e habilidade</th>
+                  <th scope="col" className="p-2">Tentativas</th>
+                  <th scope="col" className="p-2">Acertos</th>
+                  <th scope="col" className="p-2">Erros</th>
+                </tr>
+              </thead>
+              <tbody>
+                {summary.questions.map((question) => (
+                  <tr key={question.questionId} className="border-t border-violet-100">
+                    <th scope="row" className="p-2 font-normal">
+                      <span className="font-bold">{question.questionId} · {AREA_LABELS[question.objective.area]}</span>
+                      <span className="block">{question.objective.subject}</span>
+                      <span className="block text-slate-500">{question.objective.skill}</span>
+                    </th>
+                    <td className="p-2">{question.attempts}</td>
+                    <td className="p-2">{question.correct}</td>
+                    <td className="p-2">{question.errors}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
       </section>
     </AppShell>
   );

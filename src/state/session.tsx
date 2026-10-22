@@ -1,16 +1,16 @@
 import { useMemo, useState, type ReactNode } from 'react';
+import { normalizeIdentification } from '../domain/identification';
 import { SessionContext, type SessionValue } from './session-context';
 
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const [child, setChildState] = useState<string | null>(null);
+  const [identification, setIdentificationState] = useState(() => normalizeIdentification());
 
   const value = useMemo<SessionValue>(
     () => ({
-      child,
-      setChild: (name) => setChildState(name.trim() || null),
-      clearChild: () => setChildState(null),
+      identification,
+      setIdentification: (value) => setIdentificationState(normalizeIdentification(value)),
     }),
-    [child],
+    [identification],
   );
 
   return (

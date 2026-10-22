@@ -2,25 +2,33 @@ import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
 import { MainScene } from './MainScene';
 import type { Difficulty } from '../domain/types';
+import type { QuestionInteraction } from '../domain/progress';
 
 interface PhaserGameProps {
   difficulty: Difficulty;
-  onComplete: (attempts: number) => void;
+  onInteraction: (event: QuestionInteraction) => void;
+  onComplete: () => void;
 }
 
-export function PhaserGame({ difficulty, onComplete }: PhaserGameProps) {
+export function PhaserGame({ difficulty, onComplete, onInteraction }: PhaserGameProps) {
   const gameContainer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!gameContainer.current) return;
+    let active = true;
 
     const game = new Phaser.Game({
       type: Phaser.AUTO,
       parent: gameContainer.current,
-      width: 960,
-      height: 540,
+      // Renderiza em dobro, mantendo coordenadas lógicas 960 × 540 na cena.
+      width: 1920,
+      height: 1080,
       backgroundColor: '#dff5ff',
-      scene: [new MainScene({ difficulty, onComplete })],
+      scene: [new MainScene({
+        difficulty,
+        onComplete: () => { if (active) onComplete(); },
+        onInteraction: (event) => { if (active) onInteraction(event); },
+      })],
       scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -30,9 +38,10 @@ export function PhaserGame({ difficulty, onComplete }: PhaserGameProps) {
     });
 
     return () => {
+      active = false;
       game.destroy(true);
     };
-  }, [difficulty, onComplete]);
+  }, [difficulty, onComplete, onInteraction]);
 
   return <div ref={gameContainer} className="game-shell" />;
 }
