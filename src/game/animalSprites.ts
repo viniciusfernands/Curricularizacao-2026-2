@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { publicAsset } from '../publicAsset';
 import { GENERATED_ANIMAL_FRAMES } from './generatedAnimalFrames';
 import type { AnimalName } from './placementActivities';
 
@@ -27,11 +28,11 @@ export function preloadAnimals(scene: Phaser.Scene, animals: Set<AnimalName>) {
   for (const [name, sheets] of Object.entries(EXISTING_SHEETS)) {
     if (!animals.has(name as AnimalName)) continue;
     for (const [action, sheet] of Object.entries(sheets)) {
-      scene.load.spritesheet(`${name}-${action}`, `/assets/animals/${name}/${name}_${action}.png`, { frameWidth: sheet.width, frameHeight: sheet.height, endFrame: sheet.frames - 1 });
+      scene.load.spritesheet(`${name}-${action}`, publicAsset(`assets/animals/${name}/${name}_${action}.png`), { frameWidth: sheet.width, frameHeight: sheet.height, endFrame: sheet.frames - 1 });
     }
   }
   for (const [key, sheet] of Object.entries(GENERATED_ANIMAL_FRAMES)) {
-    if (animals.has(key.split('-')[0] as AnimalName)) scene.load.image(key,sheet.file);
+    if (animals.has(key.split('-')[0] as AnimalName)) scene.load.image(key,publicAsset(sheet.file));
   }
 }
 export function registerAnimals(scene: Phaser.Scene) {

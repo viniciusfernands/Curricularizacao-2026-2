@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { publicAsset } from '../publicAsset';
 import { PlacementSession, isLargestAnimalChoice } from '../domain/placement';
 import { PLACEMENT_ACTIVITIES, placementDefinition, type AnimalName } from './placementActivities';
 import { preloadAnimals, registerAnimals, animalSprite, animateAnimal } from './animalSprites';
@@ -41,7 +42,7 @@ export class MainScene extends Phaser.Scene {
     }
     preloadAnimals(this,animals);
     for (const sheet of CAT_SPRITES) {
-      this.load.spritesheet(sheet.key, `/assets/animals/cat/${sheet.file}`, { frameWidth: sheet.width, frameHeight: sheet.height, endFrame: sheet.frames - 1 });
+      this.load.spritesheet(sheet.key, publicAsset(`assets/animals/cat/${sheet.file}`), { frameWidth: sheet.width, frameHeight: sheet.height, endFrame: sheet.frames - 1 });
     }
   }
 

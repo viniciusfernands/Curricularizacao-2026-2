@@ -22,7 +22,7 @@ export function ResultScreen({ difficulty, summary, saved }: ResultScreenProps) 
           <span className="result-star result-star--one" aria-hidden="true">★</span>
           <span className="result-star result-star--two" aria-hidden="true">★</span>
           <AnimalPortrait
-            src="/assets/animals/elephant/elephant_happy.png"
+            src="assets/animals/elephant/elephant_happy.png"
             className="w-64 sm:w-72"
           />
         </div>

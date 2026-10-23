@@ -9,15 +9,15 @@ const LEVEL_STYLE: Record<
   { image: string; color: string }
 > = {
   facil: {
-    image: '/assets/animals/cat/cat_happy.png',
+    image: 'assets/animals/cat/cat_happy.png',
     color: 'level-tile--green',
   },
   medio: {
-    image: '/assets/animals/cow/cow_happy.png',
+    image: 'assets/animals/cow/cow_happy.png',
     color: 'level-tile--yellow',
   },
   dificil: {
-    image: '/assets/animals/lion/lion_happy.png',
+    image: 'assets/animals/lion/lion_happy.png',
     color: 'level-tile--coral',
   },
 };

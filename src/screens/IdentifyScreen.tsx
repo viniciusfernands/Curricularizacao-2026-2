@@ -30,7 +30,7 @@ export function IdentifyScreen() {
         <div className="flex flex-col items-center">
           <div className="thought-bubble">Vamos brincar?</div>
           <AnimalPortrait
-            src="/assets/animals/cat/cat_think.png"
+            src="assets/animals/cat/cat_think.png"
             className="w-28 sm:w-36 md:w-64"
           />
         </div>

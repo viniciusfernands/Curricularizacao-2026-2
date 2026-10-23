@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import { publicAsset } from '../publicAsset';
 
 interface AnimalPortraitProps {
   src: string;
@@ -20,7 +21,7 @@ export function AnimalPortrait({
       style={{ '--sprite-frames': frames } as CSSProperties}
       aria-hidden={alt ? undefined : true}
     >
-      <img src={src} alt={alt} draggable={false} />
+      <img src={publicAsset(src)} alt={alt} draggable={false} />
     </span>
   );
 }

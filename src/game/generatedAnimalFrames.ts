@@ -1,7 +1,7 @@
 /** Limites inspecionados no alfa: quatro poses por folha, sem recorte dos originais. */
 export const GENERATED_ANIMAL_FRAMES = {
   "fish-idle": {
-    "file": "/assets/animals/fish/fish_idle.png",
+    "file": "assets/animals/fish/fish_idle.png",
     "height": 724,
     "frames": [
       [
@@ -23,7 +23,7 @@ export const GENERATED_ANIMAL_FRAMES = {
     ]
   },
   "fish-walk": {
-    "file": "/assets/animals/fish/fish_walk.png",
+    "file": "assets/animals/fish/fish_walk.png",
     "height": 724,
     "frames": [
       [
@@ -45,7 +45,7 @@ export const GENERATED_ANIMAL_FRAMES = {
     ]
   },
   "fish-happy": {
-    "file": "/assets/animals/fish/fish_happy.png",
+    "file": "assets/animals/fish/fish_happy.png",
     "height": 724,
     "frames": [
       [
@@ -67,7 +67,7 @@ export const GENERATED_ANIMAL_FRAMES = {
     ]
   },
   "fish-think": {
-    "file": "/assets/animals/fish/fish_think.png",
+    "file": "assets/animals/fish/fish_think.png",
     "height": 724,
     "frames": [
       [
@@ -89,7 +89,7 @@ export const GENERATED_ANIMAL_FRAMES = {
     ]
   },
   "monkey-idle": {
-    "file": "/assets/animals/monkey/monkey_idle.png",
+    "file": "assets/animals/monkey/monkey_idle.png",
     "height": 724,
     "frames": [
       [
@@ -111,7 +111,7 @@ export const GENERATED_ANIMAL_FRAMES = {
     ]
   },
   "monkey-walk": {
-    "file": "/assets/animals/monkey/monkey_walk.png",
+    "file": "assets/animals/monkey/monkey_walk.png",
     "height": 724,
     "frames": [
       [
@@ -133,7 +133,7 @@ export const GENERATED_ANIMAL_FRAMES = {
     ]
   },
   "monkey-happy": {
-    "file": "/assets/animals/monkey/monkey_happy.png",
+    "file": "assets/animals/monkey/monkey_happy.png",
     "height": 724,
     "frames": [
       [
@@ -155,7 +155,7 @@ export const GENERATED_ANIMAL_FRAMES = {
     ]
   },
   "monkey-think": {
-    "file": "/assets/animals/monkey/monkey_think.png",
+    "file": "assets/animals/monkey/monkey_think.png",
     "height": 724,
     "frames": [
       [
@@ -177,7 +177,7 @@ export const GENERATED_ANIMAL_FRAMES = {
     ]
   },
   "bird-idle": {
-    "file": "/assets/animals/bird/bird_idle.png",
+    "file": "assets/animals/bird/bird_idle.png",
     "height": 724,
     "frames": [
       [
@@ -199,7 +199,7 @@ export const GENERATED_ANIMAL_FRAMES = {
     ]
   },
   "bird-walk": {
-    "file": "/assets/animals/bird/bird_walk.png",
+    "file": "assets/animals/bird/bird_walk.png",
     "height": 724,
     "frames": [
       [
@@ -221,7 +221,7 @@ export const GENERATED_ANIMAL_FRAMES = {
     ]
   },
   "bird-happy": {
-    "file": "/assets/animals/bird/bird_happy.png",
+    "file": "assets/animals/bird/bird_happy.png",
     "height": 724,
     "frames": [
       [
@@ -243,7 +243,7 @@ export const GENERATED_ANIMAL_FRAMES = {
     ]
   },
   "bird-think": {
-    "file": "/assets/animals/bird/bird_think.png",
+    "file": "assets/animals/bird/bird_think.png",
     "height": 724,
     "frames": [
       [

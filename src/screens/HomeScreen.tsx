@@ -10,10 +10,10 @@ export function HomeScreen() {
     <AppShell showBack={false} showChild={false}>
       <section className="hero-card w-full max-w-4xl text-center">
         <div className="hero-animal hero-animal--cat" aria-hidden="true">
-          <AnimalPortrait src="/assets/animals/cat/cat_idle.png" />
+          <AnimalPortrait src="assets/animals/cat/cat_idle.png" />
         </div>
         <div className="hero-animal hero-animal--elephant" aria-hidden="true">
-          <AnimalPortrait src="/assets/animals/elephant/elephant_idle.png" />
+          <AnimalPortrait src="assets/animals/elephant/elephant_idle.png" />
         </div>
 
         <div className="relative z-10 flex flex-col items-center gap-4">
