@@ -8,18 +8,13 @@ A proposta consiste no desenvolvimento de um **jogo educacional interativo** des
 
 O projeto busca aproximar a formação acadêmica de uma demanda real da comunidade, permitindo que os estudantes participem das etapas de levantamento de requisitos, planejamento, design, desenvolvimento, testes e validação de uma solução tecnológica aplicada à educação.
 
-### 📚 Documentação do projeto
-
-- [Arquitetura e stack](docs/ARQUITETURA.md)
-- [Proposta inicial de atividades](docs/ATIVIDADES.md)
-
 ---
 
 ## 🎯 Objetivo
 
 Desenvolver uma solução educacional lúdica, simples e intuitiva que auxilie no estímulo e acompanhamento de diferentes habilidades trabalhadas na Educação Infantil.
 
-Entre os conteúdos que poderão ser abordados pelo jogo estão:
+As atividades trabalham os seguintes conteúdos:
 
 * Grandezas e comparações;
 * Noções espaciais;
@@ -36,28 +31,21 @@ Entre os conteúdos que poderão ser abordados pelo jogo estão:
 
 ## 🧩 Funcionamento geral
 
-O jogo será organizado em **níveis de dificuldade**, com atividades apresentadas de forma predominantemente visual, lúdica e intuitiva.
+O jogo reúne **24 perguntas principais**, distribuídas em três níveis:
 
-Inicialmente, estão previstos três níveis:
+* **Fácil:** oito perguntas;
+* **Médio:** oito perguntas;
+* **Difícil:** oito perguntas.
 
-* **Fácil**
-* **Médio**
-* **Difícil**
+As atividades combinam **animais animados, ilustrações, instruções sonoras e feedback visual**, com ações de escolha, arraste, contagem, associação e ordenação. Nas novas atividades de posicionamento, também é possível selecionar o objeto e depois clicar ou tocar no destino.
 
-Cada nível poderá conter diferentes categorias de atividades, como:
-
-* Sons e sílabas;
-* Noções de espaço;
-* Matemática simples;
-* Percepção visual e sensorial.
-
-As atividades poderão utilizar recursos como **imagens, ilustrações, sons, palavras faladas e pequenos vídeos**, permitindo diferentes formas de interação com a criança.
+A identificação é **inteiramente opcional**: é possível começar sem preencher nome, escola, turma, ano ou professora.
 
 ---
 
 ## 🧒 Experiência do usuário
 
-Por ser destinado ao público infantil, o projeto deverá priorizar:
+Por ser destinado ao público infantil, o projeto prioriza:
 
 * Navegação simples e intuitiva;
 * Botões grandes e facilmente identificáveis;
@@ -73,59 +61,60 @@ Por ser destinado ao público infantil, o projeto deverá priorizar:
 
 ## 📊 Acompanhamento das atividades
 
-As questões poderão ser associadas a diferentes **áreas, assuntos e habilidades pedagógicas**.
+As perguntas estão associadas a **áreas, assuntos e habilidades pedagógicas**. O jogo registra localmente no navegador:
 
-Durante a utilização do jogo poderão ser registrados dados como:
-
-* Criança;
+* Identificação, quando fornecida;
 * Data e horário;
-* Atividade realizada;
-* Acertos;
-* Erros;
-* Tentativas.
+* Pergunta realizada e habilidade trabalhada;
+* Acertos, erros e tentativas avaliadas;
+* Progresso durante a atividade e conclusão da partida.
 
-Esses registros poderão futuramente auxiliar professores e profissionais da Educação na identificação de habilidades já desenvolvidas e daquelas que ainda precisam ser estimuladas.
-
----
-
-## 💻 Ambiente de utilização
-
-A aplicação deverá considerar os recursos disponíveis nas escolas municipais.
-
-Entre os principais equipamentos estão:
-
-* Notebooks;
-* Chromebooks.
-
-Os ambientes utilizados incluem principalmente:
-
-* Linux;
-* Windows.
-
-Navegadores mais comuns:
-
-* Mozilla Firefox;
-* Google Chrome;
-* Microsoft Edge.
-
-Por isso, a solução deverá priorizar a **compatibilidade entre diferentes sistemas operacionais e navegadores**.
+Ao finalizar, a tela de resultados apresenta o resumo da **partida atual**, com detalhamento por pergunta e habilidade. Esses registros podem apoiar o acompanhamento pedagógico; o conteúdo permanece sujeito à validação da equipe de Educação.
 
 ---
 
-## 🛠️ Tecnologias utilizadas
+## 🖼️ Conheça o jogo
 
-### Desenvolvimento
+<details>
+<summary><strong>Ver seis telas do jogo — capturas e GIFs</strong></summary>
 
-- TypeScript
-- React
-- Vite
-- Phaser
-- Tailwind CSS
+### Tela inicial
 
-### Desenvolvimento e colaboração
+Entrada para as atividades, com os animais que acompanham a experiência.
 
-- Git
-- GitHub
+![Tela inicial do jogo com animais e botão Começar](assets/readme/inicio.png)
+
+### Identificação opcional
+
+Escola, turma, ano, professora e nome da criança podem ser informados. Todos os campos podem ficar vazios.
+
+![Formulário de identificação com campos opcionais](assets/readme/identificacao.png)
+
+### Escolha do nível
+
+Três níveis, cada um com oito perguntas principais.
+
+![Seleção dos níveis Fácil, Médio e Difícil](assets/readme/niveis.png)
+
+### Qual animal é maior?
+
+Animação dos personagens na atividade de comparação de tamanhos.
+
+![GIF de gato e elefante animados na atividade de escolher o maior animal](assets/readme/maior-animal.gif)
+
+### Onde o peixe vive?
+
+Demonstração do arraste do peixe até a água e do feedback de acerto.
+
+![GIF mostrando o peixe sendo arrastado para a água](assets/readme/peixe-na-agua.gif)
+
+### Do menor para o maior
+
+Atividade de ordenação com gato, vaca e elefante.
+
+![Atividade com três animais e espaços para ordenar do menor para o maior](assets/readme/ordenacao.png)
+
+</details>
 
 ---
 
