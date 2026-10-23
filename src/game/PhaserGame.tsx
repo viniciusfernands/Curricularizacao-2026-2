@@ -34,11 +34,14 @@ export function PhaserGame({ difficulty, onComplete, onInteraction }: PhaserGame
         autoCenter: Phaser.Scale.CENTER_BOTH,
       },
       render: { antialias: true, transparent: false },
-      input: { activePointers: 2 },
+      input: { activePointers: 2, keyboard: false },
     });
 
     return () => {
       active = false;
+      // destroy é concluído no próximo frame. Remover já evita que outra
+      // instância calcule os alvos de mouse abaixo do canvas anterior.
+      game.canvas?.remove();
       game.destroy(true);
     };
   }, [difficulty, onComplete, onInteraction]);

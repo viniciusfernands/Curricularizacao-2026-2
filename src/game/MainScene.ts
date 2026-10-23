@@ -1,5 +1,10 @@
 import Phaser from 'phaser';
+import { PlacementSession, isLargestAnimalChoice } from '../domain/placement';
+import { PLACEMENT_ACTIVITIES, placementDefinition, type AnimalName } from './placementActivities';
+import { preloadAnimals, registerAnimals, animalSprite, animateAnimal } from './animalSprites';
+import { placementVisual } from './placementVisuals';
 import { roundedPanel, vessel } from './sceneVisuals';
+import { illustration, type IllustrationKind } from './illustrations';
 import { CAT_SPRITES } from './catSprites';
 import type { Difficulty } from '../domain/types';
 import { createProgressId, type InteractionAction, type QuestionInteraction } from '../domain/progress';
@@ -29,17 +34,24 @@ export class MainScene extends Phaser.Scene {
   }
 
   preload() {
+    const animals=new Set<AnimalName>(['cat']);
+    for(const question of this.questions) {
+      if(question.id==='F01') animals.add('elephant');
+      for(const object of PLACEMENT_ACTIVITIES[question.id]?.objects ?? []) if(object.animal) animals.add(object.animal);
+    }
+    preloadAnimals(this,animals);
     for (const sheet of CAT_SPRITES) {
       this.load.spritesheet(sheet.key, `/assets/animals/cat/${sheet.file}`, { frameWidth: sheet.width, frameHeight: sheet.height, endFrame: sheet.frames - 1 });
     }
   }
 
   create() {
+    registerAnimals(this);
     this.cameras.main.setZoom(this.scale.width / 960).centerOn(480, 270);
     for (const sheet of CAT_SPRITES) {
       this.anims.create({ key: `${sheet.key}-animation`, frames: this.anims.generateFrameNumbers(sheet.key, { start: 0, end: sheet.frames - 1 }), frameRate: sheet.rate, repeat: -1 });
     }
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => window.speechSynthesis?.cancel());
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { window.speechSynthesis?.cancel(); });
     this.showQuestion();
   }
 
@@ -53,6 +65,7 @@ export class MainScene extends Phaser.Scene {
     this.questionObjects = [];
     this.locked = false;
     this.input.enabled = true;
+    this.input.dragDistanceThreshold = 0;
     const question = this.questions[this.questionIndex];
     if (!question) {
       this.locked = true;
@@ -64,6 +77,8 @@ export class MainScene extends Phaser.Scene {
     this.createBackground();
     this.createHeader(question);
     switch (question.kind) {
+      case 'largest-animal': this.largestAnimal(); break;
+      case 'placement': this.placementActivity(question.id); break;
       case 'cat-in-box': this.catInBox(); break;
       case 'apple-count': this.countIntoTarget('🍎', 5, 3, 'CESTA', 0xf59e0b); break;
       case 'blue-choice': this.choiceRow(['AZUL', 'VERMELHO', 'AMARELO', 'VERDE'], 0, [0x3b82f6, 0xef4444, 0xfacc15, 0x22c55e]); break;
@@ -73,7 +88,7 @@ export class MainScene extends Phaser.Scene {
       case 'ball-under-table': this.ballUnderTable(); break;
       case 'star-count': this.countIntoTarget('★', 7, 5, 'CAIXA', 0x8b5cf6); break;
       case 'two-colors': this.colorSorting([0xef4444, 0x3b82f6], 3); break;
-      case 'initial-sound': this.choiceRow(['🍎\nMAÇÃ', '⚽\nBOLA', '🐸\nSAPO'], 0); break;
+      case 'initial-sound': this.choiceRow(['🍎\nMAÇÃ', '⚽\nBOLA', '🐸\nSAPO'], 0, undefined, ['apple', 'ball', 'frog']); break;
       case 'initial-letter': this.dragLetters(['B', 'D', 'P'], ['B']); break;
       case 'alternating-sequence': this.sequenceChoice(); break;
       case 'ball-order': this.ballOrder(); break;
@@ -81,13 +96,95 @@ export class MainScene extends Phaser.Scene {
       case 'syllable-three': this.countIntoTarget('★', 5, 3, 'FAIXA', 0x8b5cf6); break;
       case 'word-sol': this.dragLetters(['L', 'S', 'O'], ['S', 'O', 'L']); break;
       case 'memory': this.memoryGame(); break;
-      case 'house-choice': this.choiceRow(['🏠\nCASA', '🚗\nCARRO', '🌳\nÁRVORE'], 0); break;
+      case 'house-choice': this.choiceRow(['🏠\nCASA', '🚗\nCARRO', '🌳\nÁRVORE'], 0, undefined, ['house', 'car', 'tree']); break;
       case 'aab-sequence': this.aabSequence(); break;
+    }
+  }
+
+  private largestAnimal() {
+    const options = [
+      {id:'gato',animal:'cat' as const,x:290,size:120},
+      {id:'elefante',animal:'elephant' as const,x:650,size:270},
+    ];
+    options.forEach(option=>{
+      const sprite=this.keep(animalSprite(this,option.animal,option.x,330,option.size));
+      // Ambos os animais têm alvos confortáveis, mesmo com tamanhos diferentes.
+      const hit=this.keep(this.add.zone(option.x,330,290,280).setInteractive({useHandCursor:true}));
+      const activate=()=>{
+        const action:InteractionAction={type:'select',optionId:option.id};
+        if(isLargestAnimalChoice(option.id))this.success([sprite],action);else this.failure([sprite],action);
+      };
+      hit.on('pointerdown',activate);
+    });
+  }
+
+  private placementActivity(id:string) {
+    this.input.dragDistanceThreshold = 8;
+    const definition=PLACEMENT_ACTIVITIES[id];
+    const session=new PlacementSession(placementDefinition(definition));
+    const targets=definition.targets.map(target=>{
+      const visual=placementVisual(this,target);this.keep(visual.root);
+      const bounds=new Phaser.Geom.Rectangle(target.x-target.width/2,target.y-target.height/2,target.width,target.height);
+      return {...target,bounds,visual};
+    });
+    const objects=definition.objects.map(object=>({
+      ...object,
+      sprite: this.keep(object.animal ? animalSprite(this,object.animal,object.x,object.y,object.size) : illustration(this,'ball',object.x,object.y,object.size)),
+      placed:false,
+    }));
+    let selected:typeof objects[number]|null=null;
+    const choose=(object:typeof objects[number])=>{
+      if(this.locked||object.placed||!object.sprite.input?.enabled)return;
+      selected=object;
+    };
+    const attempt=(object:typeof objects[number],targetId:string|null)=>{
+      if(this.locked)return false;
+      const result=session.place(object.id,targetId);
+      if(!result)return false;
+      selected=null;
+      const action:InteractionAction={type:'drop',objectId:object.id,targetId};
+      if(!result.correct) {
+        if(object.animal && object.sprite instanceof Phaser.GameObjects.Sprite) animateAnimal(this,object.sprite,object.animal,'think');
+        this.failure([object.sprite],action);return false;
+      }
+      object.placed=true;object.sprite.disableInteractive();
+      const target=targets.find(t=>t.id===targetId)!;
+      if(target.visual.box)target.visual.box.place(object.sprite,result.quantity-1,target.capacity,75);
+      else {
+        const x=target.x+(target.capacity>1?(result.quantity-1-(target.capacity-1)/2)*82:0);
+        // Na ordenação, preservar as diferenças de tamanho entre os animais.
+        const size=id==='M01'?object.size:target.capacity>1?85:105;
+        object.sprite.setPosition(x,target.y);
+        object.sprite.setScale(size/object.sprite.width);
+      }
+      if(object.animal && object.sprite instanceof Phaser.GameObjects.Sprite) animateAnimal(this,object.sprite,object.animal,'happy');
+      if(result.completed)this.success([],action);else this.report('correct',action);
+      return true;
+    };
+    for(const object of objects) {
+      this.makeDropItem(object.sprite,new Phaser.Geom.Rectangle(0,0,960,540),()=>{
+        const target=targets.find(t=>Phaser.Geom.Rectangle.Contains(t.bounds,object.sprite.x,object.sprite.y));
+        return attempt(object,target?.id??null);
+      });
+      object.sprite.on('pointerdown',()=>choose(object));
+      object.sprite.on('dragstart',()=>{
+        object.sprite.setDepth(10);
+        if(object.animal && object.sprite instanceof Phaser.GameObjects.Sprite)animateAnimal(this,object.sprite,object.animal,'walk');
+      });
+    }
+    for(const target of targets) {
+      const activate=()=>{if(selected)attempt(selected,target.id);};
+      const hit=this.keep(this.add.zone(target.x,target.y,target.width,target.height).setInteractive({useHandCursor:true}));
+      // As zonas só recebem cliques; os objetos arrastáveis ficam acima delas.
+      hit.setDepth(-0.1);
+      hit.on('pointerdown',activate);
     }
   }
 
   private createBackground() {
     const graphics = this.keep(this.add.graphics());
+    // O renderizador Canvas não desenha o gradiente do WebGL.
+    graphics.fillStyle(0xdff5ff).fillRect(0, 0, 960, 540);
     graphics.fillGradientStyle(0xdff5ff, 0xdff5ff, 0xf5fbff, 0xf5fbff).fillRect(0, 0, 960, 540);
     graphics.fillStyle(0xffdf70, 0.9).fillCircle(882, 65, 38);
     graphics.fillStyle(0xb9e6a5).fillEllipse(190, 525, 600, 150);
@@ -121,15 +218,17 @@ export class MainScene extends Phaser.Scene {
     return { color, fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif', fontSize: `${size}px`, fontStyle: 'bold', align: 'center', resolution: 2, padding: { x: 3, y: 3 } };
   }
 
-  private choiceRow(labels: string[], correct: number, colors?: number[]) {
+  private choiceRow(labels: string[], correct: number, colors?: number[], pictures?: IllustrationKind[]) {
     const gap = Math.min(205, 750 / labels.length);
     const start = 480 - ((labels.length - 1) * gap) / 2;
     labels.forEach((label, index) => {
       const x = start + index * gap;
       const card = this.keep(roundedPanel(this, x, 315, Math.min(170, gap - 18), 155, colors?.[index] ?? 0xffffff, colors ? 0xffffff : 0x93c5fd).setInteractive({ useHandCursor: true }));
-      const text = this.keep(this.add.text(x, 315, label, this.textStyle(labels.length === 4 ? 20 : 38, colors ? '#ffffff' : '#334155')).setOrigin(0.5).setInteractive({ useHandCursor: true }));
+      const text = this.keep(this.add.text(x, pictures ? 364 : 315, pictures ? label.split('\n').at(-1)! : label, this.textStyle(pictures ? 22 : labels.length === 4 ? 20 : 38, colors ? '#ffffff' : '#334155')).setOrigin(0.5).setInteractive({ useHandCursor: true }));
+      const picture = pictures ? this.keep(illustration(this, pictures[index], x, 296, 94)) : null;
+      const choiceObjects = picture ? [card, text, picture] : [card, text];
       const action: InteractionAction = { type: 'select', optionId: label };
-      const choose = () => index === correct ? this.success([card, text], action) : this.failure([card, text], action);
+      const choose = () => index === correct ? this.success(choiceObjects, action) : this.failure(choiceObjects, action);
       card.on('pointerdown', choose);
       text.on('pointerdown', choose);
 
@@ -173,38 +272,39 @@ export class MainScene extends Phaser.Scene {
 
   private catInBox() {
     const box = new Phaser.Geom.Rectangle(610, 260, 240, 175);
-    this.keep(vessel(this, 730, 340, 285, 210, 'box'));
+    const container = vessel(this, 730, 340, 285, 210, 'box');
+    this.keep(container.root);
     this.keep(this.add.text(730, 450, 'CAIXA', this.textStyle(18)).setOrigin(0.5));
-    const cat = this.keep(this.add.sprite(245, 420, 'cat-idle').setScale(0.34).play('cat-idle-animation'));
+    const cat = this.keep(animalSprite(this, 'cat', 245, 420, 192));
     this.makeDropItem(cat, box, (inside) => {
       const action: InteractionAction = { type: 'drop', objectId: 'gato', targetId: inside ? 'caixa' : null };
       if (inside) {
-        cat.play('cat-happy-animation');
-        cat.setPosition(730, 300).setScale(0.25);
-        this.success([cat], action);
+        animateAnimal(this, cat, 'cat', 'happy');
+        cat.disableInteractive();
+        container.place(cat, 0, 1, 155, 25);
+        this.success([], action);
         return true;
       } else {
-        cat.play('cat-think-animation');
+        animateAnimal(this, cat, 'cat', 'think');
         this.failure([cat], action);
-        this.time.delayedCall(700, () => cat.active && cat.play('cat-idle-animation'));
+        this.time.delayedCall(700, () => cat.active && animateAnimal(this, cat, 'cat', 'walk'));
         return false;
       }
     });
     cat.on('dragstart', () => {
       cat.setDepth(10);
-      cat.play('cat-walk-animation');
+      animateAnimal(this, cat, 'cat', 'walk');
     });
   }
 
   private countIntoTarget(symbol: string, total: number, expected: number, label: string, color: number) {
     const target = new Phaser.Geom.Rectangle(585, 235, 285, 210);
-    const zone = this.keep(label === 'FAIXA'
-      ? roundedPanel(this, 727, 340, 285, 210, 0xffffff, color)
-      : vessel(this, 727, 340, 285, 210, label === 'CESTA' ? 'basket' : 'box'));
+    const container = label === 'FAIXA' ? null : vessel(this, 727, 340, 285, 210, label === 'CESTA' ? 'basket' : 'box');
+    const zone = this.keep(container?.root ?? roundedPanel(this, 727, 340, 285, 210, 0xffffff, color));
     this.keep(this.add.text(727, 455, label, this.textStyle(18)).setOrigin(0.5));
     let count = 0;
     for (let index = 0; index < total; index += 1) {
-      const item = this.keep(this.add.text(125 + (index % 3) * 115, 245 + Math.floor(index / 3) * 105, symbol, { fontSize: '58px', resolution: 2 }).setOrigin(0.5));
+      const item = this.keep(illustration(this, symbol === '🍎' ? 'apple' : 'star', 125 + (index % 3) * 115, 245 + Math.floor(index / 3) * 105, 74));
       this.makeDropItem(item, target, (inside) => {
         const action: InteractionAction = {
           type: 'count', objectId: `item-${index}`, targetId: inside ? 'recipiente' : null,
@@ -212,9 +312,9 @@ export class MainScene extends Phaser.Scene {
         };
         if (!inside) { this.failure([item], action); return false; }
         item.disableInteractive();
-        item.setPosition(660 + (count % 3) * 65, 315 + Math.floor(count / 3) * 57);
+        if (container) container.place(item, count, expected, expected > 3 ? 46 : 68);
+        else item.setPosition(660 + (count % 3) * 65, 315 + Math.floor(count / 3) * 57).setScale(0.55);
         count += 1;
-        this.tweens.add({ targets: item, scale: 0.75, duration: 180 });
         if (count === expected) this.success([zone], action);
         else this.report('progress', action);
         return true;
@@ -238,7 +338,12 @@ export class MainScene extends Phaser.Scene {
     const targetWidth = colors.length === 2 ? 290 : 220;
     const gap = colors.length === 2 ? 390 : 275;
     const targets = colors.map((_color, index) => new Phaser.Geom.Rectangle(140 + index * gap, 350, targetWidth, 110));
-    colors.forEach((color, index) => this.keep(vessel(this, targets[index].centerX, targets[index].centerY, targets[index].width, 160, 'box', color)));
+    const containers = colors.map((color, index) => {
+      const container = vessel(this, targets[index].centerX, targets[index].centerY, targets[index].width, 160, 'box', color);
+      this.keep(container.root);
+      return container;
+    });
+    const placedPerColor = colors.map(() => 0);
     let correct = 0;
     const items = colors.flatMap((color, colorIndex) => Array.from({ length: each }, (_, itemIndex) => ({ color, colorIndex, itemIndex })));
     items.forEach((item, index) => {
@@ -252,9 +357,9 @@ export class MainScene extends Phaser.Scene {
         };
         if (!inside) { this.failure([object], action); return false; }
         object.disableInteractive();
+        containers[item.colorIndex].place(object, placedPerColor[item.colorIndex]++, each, 60);
         correct += 1;
-        this.tweens.add({ targets: object, scale: 0.7, duration: 180 });
-        if (correct === items.length) this.success([object], action);
+        if (correct === items.length) this.success([], action);
         else this.report('correct', action);
         return true;
       });
@@ -279,7 +384,8 @@ export class MainScene extends Phaser.Scene {
         return true;
       });
     });
-    this.keep(this.add.text(480, 465, answer.length === 1 ? '⚽  BOLA' : '☀️', this.textStyle(27)).setOrigin(0.5));
+    this.keep(illustration(this, answer.length === 1 ? 'ball' : 'sun', answer.length === 1 ? 426 : 480, 470, 65));
+    if (answer.length === 1) this.keep(this.add.text(510, 470, 'BOLA', this.textStyle(27)).setOrigin(0.5));
   }
 
   private sequenceChoice() {
@@ -315,8 +421,9 @@ export class MainScene extends Phaser.Scene {
   }
 
   private memoryGame() {
+    const pictures: Record<string, IllustrationKind> = { '🐱': 'cat', '⚽': 'ball', '🍎': 'apple' };
     const symbols = Phaser.Utils.Array.Shuffle(['🐱', '⚽', '🍎', '🐱', '⚽', '🍎']);
-    const open: Array<{ id: string; card: Phaser.GameObjects.Container; text: Phaser.GameObjects.Text; symbol: string }> = [];
+    const open: Array<{ id: string; card: Phaser.GameObjects.Container; text: Phaser.GameObjects.Text; picture: Phaser.GameObjects.Container; symbol: string }> = [];
     let pairs = 0;
     let flipping = false;
 
@@ -325,15 +432,16 @@ export class MainScene extends Phaser.Scene {
       const y = 245 + Math.floor(index / 3) * 145;
       const card = this.keep(roundedPanel(this, x, y, 128, 112, 0x7c3aed, 0xddd6fe).setInteractive({ useHandCursor: true }));
       const text = this.keep(this.add.text(x, y, '?', this.textStyle(45, '#ffffff')).setOrigin(0.5));
+      const picture = this.keep(illustration(this, pictures[symbol], x, y, 85).setVisible(false));
       const turn = () => {
         if (this.locked || flipping || open.length === 2 || !card.input?.enabled) return;
         flipping = true;
         card.disableInteractive();
         // Reservar a carta antes da animação impede abrir uma terceira por cliques rápidos.
-        open.push({ id: `carta-${index}`, card, text, symbol });
+        open.push({ id: `carta-${index}`, card, text, picture, symbol });
         this.tweens.add({
-          targets: [card, text], scaleX: 0, duration: 130, yoyo: true,
-          onYoyo: () => { if (text.active) text.setText(symbol); },
+          targets: [card, text, picture], scaleX: 0, duration: 130, yoyo: true,
+          onYoyo: () => { if (text.active && picture.active) { text.setVisible(false); picture.setVisible(true); } },
           onComplete: () => {
             flipping = false;
             if (this.locked || !card.active || !text.active) return;
@@ -342,7 +450,7 @@ export class MainScene extends Phaser.Scene {
               type: 'pair', cardIds: [open[0].id, open[1].id], symbols: [open[0].symbol, open[1].symbol],
             };
             if (open[0].symbol === open[1].symbol) {
-              open.splice(0).forEach((item) => this.tweens.add({ targets: [item.card, item.text], alpha: 0.35, scale: 0.92, duration: 220 }));
+              open.splice(0).forEach((item) => this.tweens.add({ targets: [item.card, item.text, item.picture], alpha: 0.35, scale: 0.92, duration: 220 }));
               pairs += 1;
               if (pairs === 3) this.success([card], action);
               else this.report('correct', action);
@@ -350,7 +458,8 @@ export class MainScene extends Phaser.Scene {
               this.failure([card], action);
               this.time.delayedCall(600, () => open.splice(0).forEach((item) => {
                 if (!item.text.active || !item.card.active) return;
-                item.text.setText('?');
+                item.text.setVisible(true);
+                item.picture.setVisible(false);
                 item.card.setInteractive({ useHandCursor: true });
               }));
             }

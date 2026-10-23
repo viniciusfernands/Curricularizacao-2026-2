@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ProgressRun } from '../src/domain/progress.ts';
 import { saveRun, RUN_STORAGE_PREFIX } from '../src/data/progress.ts';
-import { QUESTIONS, questionsFor } from '../src/game/questions.ts';
+import { QUESTIONS, QUESTION_BANK, RESERVE_QUESTIONS, questionsFor } from '../src/game/questions.ts';
 
 const startedAt = '2026-10-21T12:00:00.000Z';
 const timestamp = '2026-10-21T12:01:00.000Z';
@@ -31,7 +31,7 @@ test('erro, erro, acerto registra três tentativas da pergunta com metadados e h
   assert.equal(summary.completedQuestions, 1);
 });
 
-test('sete atividades e dois erros resultam em nove tentativas, sete acertos e dois erros', () => {
+test('oito atividades e dois erros resultam em dez tentativas, oito acertos e dois erros', () => {
   const journal = run();
   journal.record(event('erro-1', 'F04', 'incorrect'));
   journal.record(event('erro-2', 'F04', 'incorrect'));
@@ -41,10 +41,10 @@ test('sete atividades e dois erros resultam em nove tentativas, sete acertos e d
     journal.record(event(question.id, question.id, 'correct', true));
   }
   const summary = journal.summarize();
-  assert.equal(summary.attempts, 9);
-  assert.equal(summary.correct, 7);
+  assert.equal(summary.attempts, 10);
+  assert.equal(summary.correct, 8);
   assert.equal(summary.errors, 2);
-  assert.equal(summary.completedQuestions, 7);
+  assert.equal(summary.completedQuestions, 8);
   assert.equal(journal.snapshot().completedAt, timestamp);
   assert.equal(summary.questions.find(q => q.questionId === 'F03').attempts, 1);
 });
@@ -73,7 +73,7 @@ test('classificação registra cada posicionamento; conclusão não soma um acer
 });
 
 test('memória conta pares avaliados, incluindo os três pares corretos', () => {
-  const journal = run('memory', 'medio');
+  const journal = new ProgressRun({id:'memory',difficulty:'medio',questions:RESERVE_QUESTIONS.filter(q=>q.id==='X01'),startedAt});
   journal.record(event('erro', 'X01', 'incorrect', false,
     { type: 'pair', cardIds: ['0', '1'], symbols: ['gato', 'bola'] }));
   for (let pair = 0; pair < 3; pair++) {
@@ -137,14 +137,14 @@ test('falha de acesso ou cota mantém resumo em memória e próxima gravação r
   assert.equal(journal.summarize().attempts, 2);
 });
 
-test('todas as 19 perguntas têm metadados e IDs de habilidade; classificação reflete conteúdo real', () => {
-  assert.equal(QUESTIONS.length, 19);
-  assert.equal(new Set(QUESTIONS.map(q => q.id)).size, 19);
+test('todas as 24 perguntas têm metadados e IDs de habilidade; classificação reflete conteúdo real', () => {
+  assert.equal(QUESTIONS.length, 24);
+  assert.equal(new Set(QUESTIONS.map(q => q.id)).size, 24);
   for (const question of QUESTIONS) {
     for (const value of Object.values(question.objective)) assert.ok(value.trim().length > 0);
   }
   assert.equal(QUESTIONS.find(q => q.id === 'D01').objective.area, 'grandezas');
-  assert.equal(QUESTIONS.find(q => q.id === 'X03').objective.area, 'audicao');
+  assert.equal(QUESTION_BANK.find(q => q.id === 'X03').objective.area, 'audicao');
   assert.equal(QUESTIONS.find(q => q.id === 'F06').objective.area, 'letras');
 });
 

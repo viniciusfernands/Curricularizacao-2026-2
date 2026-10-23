@@ -2,6 +2,14 @@ import type { PedagogicalObjective } from '../domain/pedagogy';
 
 /** Descrições do conteúdo implementado; não representam homologação pedagógica. */
 export const QUESTION_OBJECTIVES = {
+  F01: { area: 'grandezas', subject: 'Maior e menor', skillId: 'identificar-maior-animal', skill: 'Comparar gato e elefante e selecionar o maior.' },
+  F05: { area: 'habitats', subject: 'Peixe e água', skillId: 'associar-peixe-agua', skill: 'Associar o peixe ao ambiente aquático.' },
+  M01: { area: 'grandezas', subject: 'Três tamanhos', skillId: 'ordenar-tres-animais', skill: 'Ordenar gato, vaca e elefante do menor para o maior.' },
+  M05: { area: 'habitats', subject: 'Lago, floresta e pasto', skillId: 'associar-tres-habitats', skill: 'Associar peixe, macaco e vaca aos ambientes apresentados.' },
+  D02: { area: 'espaco', subject: 'Acima e ao lado', skillId: 'combinar-duas-relacoes', skill: 'Posicionar pássaro acima da árvore e gato ao lado da casa.' },
+  D03: { area: 'contagem', subject: 'Dois para cada gato', skillId: 'distribuir-dois-por-grupo', skill: 'Distribuir seis peixes em três grupos de dois.' },
+  D05: { area: 'habitats', subject: 'Seis animais e três ambientes', skillId: 'classificar-seis-animais', skill: 'Classificar dois peixes, duas vacas, macaco e pássaro por ambiente.' },
+  D08: { area: 'audicao', subject: 'Primeiro e depois', skillId: 'executar-duas-acoes-em-ordem', skill: 'Executar duas ações na ordem da instrução oral.' },
   F02: { area: 'espaco', subject: 'Dentro', skillId: 'posicionar-dentro', skill: 'Posicionar um objeto dentro de outro.' },
   F03: { area: 'contagem', subject: 'Quantidade três', skillId: 'formar-conjunto-tres', skill: 'Formar um conjunto com três elementos.' },
   F04: { area: 'cores', subject: 'Cor azul', skillId: 'reconhecer-azul', skill: 'Reconhecer a cor azul a partir de seu nome.' },

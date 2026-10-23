@@ -15,10 +15,18 @@ export interface GameQuestion {
     | 'star-count' | 'two-colors' | 'initial-sound' | 'initial-letter'
     | 'alternating-sequence' | 'ball-order' | 'three-colors'
     | 'syllable-three' | 'word-sol' | 'memory' | 'house-choice'
-    | 'aab-sequence';
+    | 'aab-sequence' | 'largest-animal' | 'placement';
 }
 
 const QUESTION_CONTENT: Omit<GameQuestion, 'objective'>[] = [
+  { id: 'F01', difficulty: 'facil', activity: 'percepcao', kind: 'largest-animal', title: 'Qual animal é maior?', instruction: 'Toque no animal maior.' },
+  { id: 'F05', difficulty: 'facil', activity: 'animais', kind: 'placement', title: 'Onde o peixe vive?', instruction: 'Leve o peixe para onde ele vive.' },
+  { id: 'M01', difficulty: 'medio', activity: 'percepcao', kind: 'placement', title: 'Do menor para o maior', instruction: 'Coloque os animais do menor para o maior.' },
+  { id: 'M05', difficulty: 'medio', activity: 'animais', kind: 'placement', title: 'Cada animal em seu lugar', instruction: 'Leve cada animal para o lugar onde ele vive.' },
+  { id: 'D02', difficulty: 'dificil', activity: 'espaco', kind: 'placement', title: 'Acima e ao lado', instruction: 'Coloque o pássaro acima da árvore e o gato ao lado da casa.' },
+  { id: 'D03', difficulty: 'dificil', activity: 'contagem', kind: 'placement', title: 'Dois para cada gato', instruction: 'Dê dois peixes para cada gato.' },
+  { id: 'D05', difficulty: 'dificil', activity: 'animais', kind: 'placement', title: 'Vamos encontrar os ambientes?', instruction: 'Leve cada animal para o lugar onde ele vive.' },
+  { id: 'D08', difficulty: 'dificil', activity: 'espaco', kind: 'placement', title: 'Primeiro e depois', instruction: 'Primeiro, coloque a bola na caixa. Depois, leve o gato até a casa.' },
   { id: 'F02', difficulty: 'facil', activity: 'espaco', kind: 'cat-in-box', title: 'Onde fica o gato?', instruction: 'Coloque o gato dentro da caixa.' },
   { id: 'F03', difficulty: 'facil', activity: 'contagem', kind: 'apple-count', title: 'Vamos contar?', instruction: 'Coloque três maçãs na cesta.' },
   { id: 'F04', difficulty: 'facil', activity: 'cores', kind: 'blue-choice', title: 'Qual é a cor azul?', instruction: 'Toque na cor azul.' },
@@ -40,22 +48,13 @@ const QUESTION_CONTENT: Omit<GameQuestion, 'objective'>[] = [
   { id: 'X04', difficulty: 'dificil', activity: 'percepcao', kind: 'aab-sequence', title: 'Qual figura vem depois?', instruction: 'Observe a sequência. Qual figura vem depois?' },
 ];
 
-export const QUESTIONS: GameQuestion[] = QUESTION_CONTENT.map((question) => ({
+export const QUESTION_BANK: GameQuestion[] = QUESTION_CONTENT.map((question) => ({
   ...question,
   objective: QUESTION_OBJECTIVES[question.id],
 }));
 
+export const QUESTIONS = QUESTION_BANK.filter(q => !q.id.startsWith('X')).sort((a,b) => a.id.localeCompare(b.id));
+export const RESERVE_QUESTIONS = QUESTION_BANK.filter(q => q.id.startsWith('X'));
+
 export const questionsFor = (difficulty: Difficulty) =>
   QUESTIONS.filter((question) => question.difficulty === difficulty);
-
-export const SKIPPED_ANIMAL_QUESTIONS = [
-  { id: 'F01', missing: ['rato'] },
-  { id: 'F05', missing: ['peixe'] },
-  { id: 'M01', missing: ['rato', 'cachorro'] },
-  { id: 'M05', missing: ['peixe', 'macaco'] },
-  { id: 'D02', missing: ['pássaro', 'cachorro'] },
-  { id: 'D03', missing: ['peixe'] },
-  { id: 'D05', missing: ['peixe', 'polvo', 'macaco', 'tucano', 'cavalo'] },
-  { id: 'D08', missing: ['cachorro'] },
-  { id: 'X02', missing: ['coelho', 'macaco'] },
-] as const;
