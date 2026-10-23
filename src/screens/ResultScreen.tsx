@@ -4,7 +4,7 @@ import { Button } from '../components/Button';
 import { useNav } from '../app/nav-context';
 import type { RunSummary } from '../domain/progress';
 import { AREA_LABELS } from '../domain/pedagogy';
-import { DIFFICULTY_LABEL, type Difficulty } from '../domain/types';
+import { DIFFICULTIES, DIFFICULTY_LABEL, type Difficulty } from '../domain/types';
 
 interface ResultScreenProps {
   difficulty: Difficulty;
@@ -14,6 +14,7 @@ interface ResultScreenProps {
 
 export function ResultScreen({ difficulty, summary, saved }: ResultScreenProps) {
   const { go, home } = useNav();
+  const nextDifficulty = DIFFICULTIES[DIFFICULTIES.indexOf(difficulty) + 1];
 
   return (
     <AppShell showBack={false}>
@@ -43,8 +44,17 @@ export function ResultScreen({ difficulty, summary, saved }: ResultScreenProps) 
             </div>
           )}
 
-          <div className="mt-1 flex flex-col gap-3 sm:flex-row">
-            <Button onClick={() => go({ name: 'game', difficulty })}>
+          <div className="mt-1 flex w-full max-w-sm flex-col gap-3">
+            {nextDifficulty && (
+              <Button onClick={() => go({ name: 'game', difficulty: nextDifficulty })}>
+                <span>
+                  Próximo nível
+                  <span className="block text-base">{DIFFICULTY_LABEL[nextDifficulty]}</span>
+                </span>
+                <span aria-hidden="true">→</span>
+              </Button>
+            )}
+            <Button variant={nextDifficulty ? 'secondary' : 'primary'} onClick={() => go({ name: 'game', difficulty })}>
               <span aria-hidden="true">↻</span> Jogar de novo
             </Button>
             <Button variant="secondary" onClick={home}>

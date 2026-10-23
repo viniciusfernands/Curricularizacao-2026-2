@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { Narrator, type NarrationState } from '../audio/narrator';
+import { spokenInstruction } from '../audio/instructions';
 import { publicAsset } from '../publicAsset';
 import { PlacementSession, isLargestAnimalChoice } from '../domain/placement';
 import { PLACEMENT_ACTIVITIES, placementDefinition, type AnimalName } from './placementActivities';
@@ -25,6 +27,8 @@ export class MainScene extends Phaser.Scene {
   private readonly questions: GameQuestion[];
   private questionIndex = 0;
   private locked = false;
+  private readonly narrator = new Narrator();
+  private narrationTimer?: Phaser.Time.TimerEvent;
   private questionObjects: Phaser.GameObjects.GameObject[] = [];
 
   constructor({ difficulty, onComplete, onInteraction }: MainSceneOptions) {
@@ -52,7 +56,8 @@ export class MainScene extends Phaser.Scene {
     for (const sheet of CAT_SPRITES) {
       this.anims.create({ key: `${sheet.key}-animation`, frames: this.anims.generateFrameNumbers(sheet.key, { start: 0, end: sheet.frames - 1 }), frameRate: sheet.rate, repeat: -1 });
     }
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { window.speechSynthesis?.cancel(); });
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.stopNarration());
+    this.events.once(Phaser.Scenes.Events.DESTROY, () => this.stopNarration());
     this.showQuestion();
   }
 
@@ -61,7 +66,14 @@ export class MainScene extends Phaser.Scene {
     return object;
   }
 
+  stopNarration() {
+    this.narrationTimer?.remove();
+    this.narrationTimer = undefined;
+    this.narrator.stop();
+  }
+
   private showQuestion() {
+    this.stopNarration();
     this.questionObjects.forEach((object) => object.destroy());
     this.questionObjects = [];
     this.locked = false;
@@ -201,18 +213,27 @@ export class MainScene extends Phaser.Scene {
     this.keep(this.add.text(55, 75, `${this.questionIndex + 1}/${this.questions.length}`, this.textStyle(15, '#64748b')).setOrigin(0.5));
     const button = this.keep(this.add.circle(888, 72, 38, 0x7c3aed).setStrokeStyle(4, 0xddd6fe).setInteractive({ useHandCursor: true }));
     const icon = this.keep(this.add.text(888, 72, '🔊', { fontSize: '28px' }).setOrigin(0.5).setInteractive({ useHandCursor: true }));
-    const speak = () => {
-      if (!('speechSynthesis' in window)) return;
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(question.instruction);
-      utterance.lang = 'pt-BR';
-      utterance.rate = 0.85;
-      window.speechSynthesis.speak(utterance);
-      this.tweens.add({ targets: [button, icon], scale: 1.12, duration: 140, yoyo: true });
+    const status = this.keep(this.add.text(480, 143, '', this.textStyle(15, '#475569')).setOrigin(0.5));
+    const messages: Record<NarrationState, string> = {
+      idle: '', loading: 'Preparando o áudio…', speaking: '',
+      blocked: 'Toque no alto-falante para ouvir a instrução.',
+      unavailable: 'Áudio indisponível. Peça ajuda para ler a instrução.',
+      error: 'Não foi possível ouvir. Toque no alto-falante para tentar de novo.',
     };
-    button.on('pointerdown', speak);
-    icon.on('pointerdown', speak);
-    this.time.delayedCall(350, speak);
+    const speak = () => {
+      if (this.locked) return;
+      this.narrator.speak(spokenInstruction(question.id, question.instruction), state => {
+        if (!status.active) return;
+        status.setText(messages[state]);
+        button.setFillStyle(state === 'speaking' ? 0x059669 : 0x7c3aed);
+        icon.setText(state === 'speaking' ? '🔉' : '🔊');
+      });
+    };
+    const automatic = this.time.delayedCall(350, speak);
+    this.narrationTimer = automatic;
+    const repeat = () => { automatic.remove(); speak(); };
+    button.on('pointerdown', repeat);
+    icon.on('pointerdown', repeat);
   }
 
   private textStyle(size: number, color = '#334155'): Phaser.Types.GameObjects.Text.TextStyle {
@@ -517,6 +538,7 @@ export class MainScene extends Phaser.Scene {
 
   private success(targets: DisplayObject[], action: InteractionAction) {
     if (this.locked) return;
+    this.stopNarration();
     this.report('correct', action, true);
     this.locked = true;
     this.input.enabled = false;

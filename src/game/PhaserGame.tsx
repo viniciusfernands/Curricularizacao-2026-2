@@ -16,6 +16,11 @@ export function PhaserGame({ difficulty, onComplete, onInteraction }: PhaserGame
   useEffect(() => {
     if (!gameContainer.current) return;
     let active = true;
+    const scene = new MainScene({
+      difficulty,
+      onComplete: () => { if (active) onComplete(); },
+      onInteraction: (event) => { if (active) onInteraction(event); },
+    });
 
     const game = new Phaser.Game({
       type: Phaser.AUTO,
@@ -24,11 +29,7 @@ export function PhaserGame({ difficulty, onComplete, onInteraction }: PhaserGame
       width: 1920,
       height: 1080,
       backgroundColor: '#dff5ff',
-      scene: [new MainScene({
-        difficulty,
-        onComplete: () => { if (active) onComplete(); },
-        onInteraction: (event) => { if (active) onInteraction(event); },
-      })],
+      scene: [scene],
       scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -39,6 +40,7 @@ export function PhaserGame({ difficulty, onComplete, onInteraction }: PhaserGame
 
     return () => {
       active = false;
+      scene.stopNarration();
       // destroy é concluído no próximo frame. Remover já evita que outra
       // instância calcule os alvos de mouse abaixo do canvas anterior.
       game.canvas?.remove();
